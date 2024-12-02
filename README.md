@@ -6,7 +6,7 @@
 写真を載せられるシンプルなカレンダー．
 
 ## Build Examples and Projects
-`just` が必要．
+[`just`](https://github.com/casey/just) が必要．
 ```zsh
 just
 ```
