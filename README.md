@@ -1,7 +1,7 @@
 # typst-simple-calendar
 
-![screenshot](https://github.com/user-attachments/assets/60b2aa29-a57e-4ab8-b03b-7edafa3e74ee)
-![calendar2](https://github.com/user-attachments/assets/8836ce83-1260-4826-8b68-b4de902e7d59)
+![jan](https://github.com/user-attachments/assets/c538d269-853b-417d-b161-9735a5e634dd)
+![feb](https://github.com/user-attachments/assets/5aae85c7-0463-4a01-9185-56d761facb5a)
 
 写真を載せられるシンプルなカレンダー．
 
