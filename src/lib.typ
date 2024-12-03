@@ -1,5 +1,4 @@
-#let weekday_names = ([日], [月], [火], [水], [木], [金], [土])
-
+#let default_weekday_names = ([Sun], [Mon], [Tue], [Wed], [Thu], [Fri], [Sat])
 #let read_syukujitsu_csv() = {
   let csv = csv("/syukujitsu.csv")
   let result = (:)
@@ -9,25 +8,19 @@
   result
 }
 
-#let month_calendar_table(year, month, holiday_data: (:), weekday_names:weekday_names) = {
-  let month_date = datetime(
+#let month_calendar_table(year, month, holiday_data: (:), weekday_names: default_weekday_names) = {
+  let month_day_1 = datetime(
     year: year,
     month: month,
     day: 1,
   )
 
-  let monthly_days = ()
+  let days = range(0, 31)
+    .map(day => month_day_1 + duration(days: day))
+    .filter(day => day.month() == month)
 
-  for day in range(0, 31) {
-    let day = month_date + duration(days: day)
-    if day.month() != month {
-      break
-    }
-    monthly_days.push(day)
-  }
-
-  let monday_padding = calc.rem-euclid(
-    int(monthly_days.first().display("[weekday repr:monday]")),
+  let first_day_padding = calc.rem-euclid(
+    int(days.first().display("[weekday repr:monday]")),
     7
   )
 
@@ -38,20 +31,23 @@
     // fill: rgb(200, 200, 255),
     // fill: rgb(255, 255, 255, 80%),
     ..weekday_names.map(name => {
-      let color = if name == [日] {
-          red
-      } else if name == [土] {
-          blue
+      let color = if name == weekday_names.at(0) {
+        // Sunday
+        red
+      } else if name == weekday_names.at(6) {
+        // Saturday
+        blue
       } else {
-          black
+        black
       }
-      let result = place(top + center)[
+      let weekday_name = place(top + center)[
         #text(name, fill: color, size: 1.5em, weight: "black")
       ]
-      grid.cell(result, stroke: (bottom: 1pt))
+      grid.cell(weekday_name, stroke: (bottom: 1pt))
     }),
-    ..range(0, monday_padding).map(_ => []),
-    ..monthly_days.map(day => {
+    ..(([], ) * first_day_padding),
+    ..days.map(day => {
+      // y/m/d or y-m-d
       let holiday_name = holiday_data.at(day.display("[year]/[month padding:none]/[day padding:none]"), default: "")
       let holiday_name =  if holiday_name == "" {
         holiday_data.at(day.display("[year]-[month padding:none]-[day padding:none]"), default: "")
@@ -83,39 +79,37 @@
     })
   )
 
-  rect(inset: 0.5pt, radius: 10pt, fill: rgb(255, 255, 255, 80%),)[#cal_grid]
+  rect(inset: 0.5pt, radius: 10pt, fill: rgb(255, 255, 255, 80%),)[
+    #cal_grid
+  ]
 }
 
-#let month_calendar(year, month, image, holiday_data: (:), weekday_names: weekday_names) = {
+#let month_calendar(year, month, image, title: "[year] Calendar", holiday_data: (:), weekday_names: default_weekday_names, month_format: "[month repr:long]") = {
+  let month_datetime = datetime(year: year, month: month, day: 1)
+
   box(clip: true)[
-    // #quadruple_image("/1.jpeg", "/1.jpeg", "/1.jpeg", "/1.jpeg")
-    // #double_image("/1.jpeg", "/tate.jpeg")
-    // #single_image("/fish.jpeg")
-    // #half_area(single_image("/fish.jpeg"))
-    // #image("/1.jpeg", width: 50%, height: 50%, fit: "cover")
-    // #images.at(month - 1, default: half_area(single_image("/1.jpeg")))
     #image
   ]
 
   v(1fr)
   place(bottom)[
     #box(height: 50%, width: 100%)[
-    #place(top + left)[
-    #pad(1em)[
-      #month_calendar_table(year, month, holiday_data: holiday_data, weekday_names: weekday_names)
+      #place(top + left)[
+        #pad(1em)[
+          #month_calendar_table(year, month, holiday_data: holiday_data, weekday_names: weekday_names)
+        ]
+      ]
     ]
-  ]
-  ]
   ]
   v(1fr)
 
   place(horizon + right, dy: -7.3%, dx: -1.5em)[
-    #text(size: 7em, weight: "black", fill: white)[#month 月]
+    #text(size: 7em, weight: "black", fill: white)[#month_datetime.display(month_format)]
   ]
 
   place(bottom + center, dy: -2em)[
     #text()[
-      #year 年カレンダー
+      #datetime(year: year, month: month, day: 1).display(title)
     ]
   ]
 }
@@ -167,15 +161,17 @@
   months: range(1, 12 + 1),
   font: "",
   images: (),
-  weekday_names: weekday_names,
+  weekday_names: default_weekday_names,
   holiday_data: read_syukujitsu_csv(),
+  title: "[year] Calendar",
+  month_names: range(1, 12 + 1).map(month => datetime(year: 0, month: month, day: 1).display("[month repr:long]")),
 ) = [
   #set text(font: font)
   #set page(margin: 0pt)
   #show box: it => align(it, center)
 
   #for month in months [
-    #month_calendar(year, month, images.at(month - 1, default: half_area(single_image("/1.jpeg"))), holiday_data: holiday_data, weekday_names: weekday_names)
+    #month_calendar(year, month, images.at(month - 1, default: half_area(single_image("/1.jpeg"))), holiday_data: holiday_data, weekday_names: weekday_names, title: title, month_format: month_names.at(month - 1, default: "[month repr:long]"))
 
     #pagebreak(weak: true)
   ]
