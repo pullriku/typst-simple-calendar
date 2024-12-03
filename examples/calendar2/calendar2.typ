@@ -15,5 +15,5 @@
     full_area(double_image(lake, sunset)),
     half_area(quadruple_image(lake, sunset, lake, sunset)),
     full_area(quadruple_image(lake, sunset, lake, sunset)),
-  )
+  ),
 )

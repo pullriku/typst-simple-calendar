@@ -8,17 +8,17 @@
 
 #lib.month_calendar(
   2025,
-  10,
+  1,
   half_area(single_image(lake)),
 )
 #lib.month_calendar(
   2025,
-  11,
+  2,
   full_area(single_image(sunset)),
 )
 
 #lib.month_calendar(
   2025, 
-  12,
+  3,
   half_area(double_image(lake, sunset)))
 )
