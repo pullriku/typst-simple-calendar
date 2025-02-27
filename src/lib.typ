@@ -8,7 +8,9 @@
   result
 }
 
-#let month_calendar_table(year, month, holiday_data: (:), weekday_names: default_weekday_names) = {
+#let month_calendar_table(
+  year, month, holiday_data: (:), weekday_names: default_weekday_names,
+) = {
   let month_day_1 = datetime(
     year: year,
     month: month,
@@ -26,7 +28,7 @@
 
   let cal_grid = grid(
     columns: (1fr,) * 7,
-    rows: (3em,) + (5.5em,) * 6,
+    rows: (3em,) + (1fr,) * 6,
     inset: 1em,
     // fill: rgb(200, 200, 255),
     // fill: rgb(255, 255, 255, 80%),
@@ -68,7 +70,7 @@
       }
       let day_num = day.display("[day padding:none]")
       place(top + left)[
-        #text(fill: color, size: 1.5em, weight: "bold")[
+        #text(fill: color, size: 2em, weight: "bold")[
           #day_num 
         ]
         #linebreak()
@@ -79,9 +81,12 @@
     })
   )
 
-  rect(inset: 0.5pt, radius: 10pt, fill: rgb(255, 255, 255, 80%),)[
+  let rect = rect(inset: 0.5pt, radius: 10pt, fill: rgb(255, 255, 255, 80%),)[
     #cal_grid
   ]
+
+
+  rect
 }
 
 #let month_calendar(year, month, image, title: "[year] Calendar", holiday_data: (:), weekday_names: default_weekday_names, month_format: "[month repr:long]") = {
@@ -103,8 +108,14 @@
   ]
   v(1fr)
 
-  place(horizon + right, dy: -7.3%, dx: -1.5em)[
-    #text(size: 7em, weight: "black", fill: white)[#month_datetime.display(month_format)]
+  let half_upper = box(height: 50%, width: 100%)[
+    #place(bottom + right, dy: -3em, dx: -2em)[
+      #text(size: 7em, weight: "black", fill: white)[#month_datetime.display(month_format)]
+    ]
+  ]
+
+  place(top)[
+    #half_upper
   ]
 
   place(bottom + center, dy: -2em)[
